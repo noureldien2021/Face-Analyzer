@@ -32,7 +32,7 @@ A web-based application that allows users to upload a photo, analyze facial attr
 # Architecture Diagram
 
 <p align="center">
-  <img src="https://example.com/your-image.png" alt="Description" width="400">
+  <img src="file:///C:/Users/NOR/Desktop/imgrecognation/Emotion%20&%20Face%20Analyzer.jpeg" alt="Description" width="400">
 </p>
 
 # WorkFlow
