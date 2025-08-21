@@ -61,11 +61,11 @@ A web-based application that allows users to upload a photo, analyze facial attr
 
 
 # WorkFlow
-1. Upload image to source S3 bucket.  
-2. Lambda is triggered automatically.  
-3. Image is processed (resize, watermark).  
-4. Processed image is saved to destination bucket.  
-5. Metadata is saved to DynamoDB (optional).  
+1. User uploads an image from the web interface to the S3 bucket.
+2. User clicks Analyze, which triggers the API Gateway endpoint.
+3. Lambda function receives the S3 image key and calls AWS Rekognition to analyze the face(s) and emotions.
+4. Analysis results are returned to the web page and displayed in a table.
+5. User can download the full analysis report as a PDF.
 
 # Learning Outcomes
 1. Building event-driven architectures with Lambda and S3 triggers.
