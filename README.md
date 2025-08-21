@@ -68,9 +68,9 @@ A web-based application that allows users to upload a photo, analyze facial attr
 5. User can download the full analysis report as a PDF.
 
 # Learning Outcomes
-1. Building event-driven architectures with Lambda and S3 triggers.
-2. Understanding cost-efficient, auto-scaling serverless applications.
-3. Enhancing security using IAM roles and S3 bucket policies.
+1. Learn how to build a serverless image analysis application using AWS Lambda and API Gateway.
+2. Gain experience integrating Amazon S3 with a web interface for file uploads.
+3. Understand how to use AWS Rekognition for facial and emotion detection.
 
 
 
