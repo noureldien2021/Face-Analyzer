@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Emotion & Face Analyzer </title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      padding: 30px;
+      color: #333;
+    }
+
+    h1 {
+      color: #1e3a8a;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      margin: 10px 0;
+      padding: 10px 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #1e3a8a;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #3b82f6;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    img {
+      max-width: 450px;
+      display: block;
+      margin: 20px auto;
+      border-radius: 8px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+    }
+
+    table {
+      border-collapse: collapse;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 700px;
+      background: white;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid #e0e0e0;
+      padding: 12px 15px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background-color: #1e3a8a;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    #downloadPdfBtn {
+      display: block;
+      margin: 10px auto;
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #16a34a;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    #downloadPdfBtn:hover {
+      background-color: #4ade80;
+    }
+  </style>
+</head>
+<body>
+  <h1>Emotion & Face Analyzer </h1>
+
+  <input type="file" id="fileInput" accept="image/*">
+  <br>
+  <button onclick="uploadAndAnalyze()">Upload & Analyze</button>
+
+  <div id="status"></div>
+  <img id="uploadedImage" src="" alt="" style="display:none;">
+
+  <div id="results"></div>
+  <button id="downloadPdfBtn" style="display:none;" onclick="downloadPdf()">Download Full PDF Report</button>
+
+  <script>
+    const bucketName = "s3-recognation-21"; 
+    const region = "us-east-1";              
+    const s3Url = `https://${bucketName}.s3.${region}.amazonaws.com/`;
+    const analyzeApi = "https://wfpxcn19pj.execute-api.us-east-1.amazonaws.com/dev/analyze";
+
+    let lastAnalysisData = null;
+
+    async function uploadAndAnalyze() {
+      const file = document.getElementById('fileInput').files[0];
+      const statusDiv = document.getElementById('status');
+      const imgEl = document.getElementById('uploadedImage');
+      const resultsDiv = document.getElementById('results');
+      const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+
+      downloadPdfBtn.style.display = "none";
+
+      if (!file) {
+        statusDiv.innerText = " Please select a file first.";
+        return;
+      }
+
+      statusDiv.innerText = "⏳ Uploading...";
+
+      try {
+        // رفع الصورة على S3
+        const uploadRes = await fetch(s3Url + file.name, {
+          method: "PUT",
+          body: file,
+          headers: { "Content-Type": file.type }
+        });
+
+        if (!uploadRes.ok) throw new Error("Upload failed");
+
+        imgEl.src = s3Url + file.name;
+        imgEl.style.display = "block";
+        statusDiv.innerText = " Uploaded! Analyzing...";
+
+        // استدعاء API التحليل
+        const analyzeRes = await fetch(analyzeApi, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bucket: bucketName, key: file.name })
+        });
+
+        const data = await analyzeRes.json();
+        if (!data || data.length === 0) throw new Error("No face detected");
+        const face = data[0];
+        lastAnalysisData = face;
+
+        
+        resultsDiv.innerHTML = `
+          <h2>Analysis Result</h2>
+          <table>
+            <tr><th>Attribute</th><th>Value</th></tr>
+            <tr><td>Age Range</td><td>${face.AgeRange.Low} - ${face.AgeRange.High}</td></tr>
+            <tr><td>Gender</td><td>${face.Gender.Value}</td></tr>
+            <tr><td>Smile</td><td>${face.Smile.Value ? "Yes" : "No"}</td></tr>
+            <tr><td>Beard</td><td>${face.Beard.Value ? "Yes" : "No"}</td></tr>
+            <tr><td>Emotions</td><td>${face.Emotions.map(e => e.Type + ": " + e.Confidence.toFixed(1) + "%").join("<br>")}</td></tr>
+          </table>
+        `;
+
+        downloadPdfBtn.style.display = "block";
+        statusDiv.innerText = " Analysis complete!";
+      } catch (err) {
+        statusDiv.innerText = " Error: " + err.message;
+      }
+    }
+
+    async function downloadPdf() {
+      if (!lastAnalysisData) return;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(18);
+      doc.text("Face Analysis Full Report", 20, 20);
+
+      let y = 30;
+      doc.setFontSize(12);
+
+      function addLine(label, value) {
+        doc.text(`${label}: ${value}`, 20, y);
+        y += 7;
+      }
+
+      const face = lastAnalysisData;
+
+      addLine("Age Range", `${face.AgeRange.Low} - ${face.AgeRange.High}`);
+      addLine("Gender", face.Gender.Value);
+      addLine("Smile", face.Smile.Value ? "Yes" : "No");
+      addLine("Beard", face.Beard.Value ? "Yes" : "No");
+      addLine("Mustache", face.Mustache.Value ? "Yes" : "No");
+      addLine("Eyes Open", face.EyesOpen.Value ? "Yes" : "No");
+      addLine("Eyeglasses", face.Eyeglasses.Value ? "Yes" : "No");
+      addLine("Sunglasses", face.Sunglasses.Value ? "Yes" : "No");
+      addLine("Mouth Open", face.MouthOpen.Value ? "Yes" : "No");
+      addLine("Face Occluded", face.FaceOccluded.Value ? "Yes" : "No");
+
+      doc.text("Emotions:", 20, y); y += 7;
+      face.Emotions.forEach(e => {
+        doc.text(`- ${e.Type}: ${e.Confidence.toFixed(1)}%`, 25, y);
+        y += 7;
+      });
+
+      addLine("Pose Pitch", face.Pose.Pitch.toFixed(2));
+      addLine("Pose Roll", face.Pose.Roll.toFixed(2));
+      addLine("Pose Yaw", face.Pose.Yaw.toFixed(2));
+
+      addLine("Brightness", face.Quality.Brightness.toFixed(2));
+      addLine("Sharpness", face.Quality.Sharpness.toFixed(2));
+
+      doc.text("Landmarks:", 20, y); y += 7;
+      face.Landmarks.forEach(l => {
+        doc.text(`- ${l.Type}: (X: ${l.X.toFixed(3)}, Y: ${l.Y.toFixed(3)})`, 25, y);
+        y += 7;
+      });
+
+      addLine("Bounding Box Left", face.BoundingBox.Left.toFixed(3));
+      addLine("Bounding Box Top", face.BoundingBox.Top.toFixed(3));
+      addLine("Bounding Box Width", face.BoundingBox.Width.toFixed(3));
+      addLine("Bounding Box Height", face.BoundingBox.Height.toFixed(3));
+
+      doc.save("full_analysis_report.pdf");
+    }
+  </script>
+</body>
+</html>
