@@ -31,8 +31,9 @@ A web-based application that allows users to upload a photo, analyze facial attr
 
 # Architecture Diagram
 
-![Architecture Diagram](https://github.com/noureldien2021/Project--Serverless-Image-Processing-with-S3-and-Lambda/blob/main/_Serverless%20Image%20Processing.jpeg?raw=true)
-
+<p align="center">
+  <img src="https://example.com/your-image.png" alt="Description" width="400">
+</p>
 
 # WorkFlow
 1. User uploads an image from the web interface to the S3 bucket.
