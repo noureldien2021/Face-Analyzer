@@ -31,7 +31,7 @@ A web-based application that allows users to upload a photo, analyze facial attr
 
 # Architecture Diagram
 
-![Architecture Diagram](https://github.com/noureldien2021/Project-2-Serverless-Image-Processing-with-S3-and-Lambda/blob/main/_Serverless%20Image%20Processing.jpeg?raw=true)
+![Architecture Diagram](https://github.com/noureldien2021/Project--Serverless-Image-Processing-with-S3-and-Lambda/blob/main/_Serverless%20Image%20Processing.jpeg?raw=true)
 
 
 # WorkFlow
