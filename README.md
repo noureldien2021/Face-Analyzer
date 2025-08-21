@@ -22,6 +22,8 @@
 **Description**
 
 A web-based application that allows users to upload a photo, analyze facial attributes, and detect emotions using AWS Rekognition. The app provides a detailed analysis of age, gender, smile, beard, and dominant emotions, and allows users to download a PDF report.
+
+
 **Key AWS Services Used**
 
 1. Amazon S3: Stores original and processed images.
