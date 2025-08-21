@@ -31,7 +31,7 @@ A web-based application that allows users to upload a photo, analyze facial attr
 
 # Architecture Diagram
 
-![Architecture Diagram](https://raw.githubusercontent.com/noureldien2021/Face-Analyzer/refs/heads/master/Emotion%20%26%20Face%20Analyzer.jpeg))
+![Architecture Diagram](https://raw.githubusercontent.com/noureldien2021/Face-Analyzer/refs/heads/master/Emotion%20%26%20Face%20Analyzer.jpeg)
 
 
 # WorkFlow
@@ -41,7 +41,7 @@ A web-based application that allows users to upload a photo, analyze facial attr
 4. Analysis results are returned to the web page and displayed in a table.
 5. User can download the full analysis report as a PDF.
 
-![Architecture Diagram](https://raw.githubusercontent.com/noureldien2021/Face-Analyzer/refs/heads/master/digram.png))
+![Architecture Diagram](https://raw.githubusercontent.com/noureldien2021/Face-Analyzer/refs/heads/master/digram.png)
 
 # Learning Outcomes
 1. Learn how to build a serverless image analysis application using AWS Lambda and API Gateway.
