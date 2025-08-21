@@ -26,9 +26,10 @@ A web-based application that allows users to upload a photo, analyze facial attr
 
 **Key AWS Services Used**
 
-1. Amazon S3: Stores original and processed images.
-2. AWS Lambda: Executes image processing (resize, watermarking).
-3. Amazon DynamoDB: Store metadata about uploaded images.
+1. Amazon S3: Stores uploaded images for analysis.
+2. AWS Lambda: Runs the face and emotion detection using AWS Rekognition API.
+3. Amazon API Gateway: Provides a secure HTTP endpoint to trigger the Lambda function.
+4. AWS Rekognition: Detects faces and analyzes attributes like age, gender, smile, beard, and emotions.
 
 
 
